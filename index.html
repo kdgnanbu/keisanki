@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102a43">
+  <title>÷1.1 計算機</title>
+  <style>
+    :root { --navy:#102a43; --blue:#2676d9; --ink:#172b4d; --muted:#627d98; --paper:#fff; --mist:#f3f7fb; --line:#d9e2ec; --orange:#f28c28; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100svh; color:var(--ink); background:linear-gradient(155deg,#e9f2fb 0%,#f8fbfe 55%,#e7f3f2 100%); font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif; }
+    main { width:min(100%,480px); min-height:100svh; margin:auto; padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:18px; }
+    header { display:flex; align-items:center; gap:12px; padding:5px 2px; }
+    .mark { display:grid; place-items:center; width:42px; height:42px; border-radius:13px; background:var(--navy); color:white; font-size:21px; font-weight:800; box-shadow:0 7px 15px #102a4333; }
+    h1 { margin:0; font-size:21px; letter-spacing:.02em; } .subtitle { margin:3px 0 0; color:var(--muted); font-size:13px; }
+    .card { background:#fffffff2; border:1px solid #ffffffaa; border-radius:24px; box-shadow:0 14px 35px #102a4312; }
+    .entry { padding:20px; }
+    label { display:block; font-size:13px; color:var(--muted); font-weight:700; margin-bottom:9px; }
+    .input-wrap { display:flex; align-items:center; gap:8px; border:2px solid var(--line); border-radius:15px; padding:0 13px; background:white; transition:.15s; }
+    .input-wrap:focus-within { border-color:var(--blue); box-shadow:0 0 0 4px #2676d91c; }
+    input { width:100%; height:58px; border:0; outline:0; padding:0; font:700 25px/1 ui-rounded,"SF Pro Rounded",sans-serif; color:var(--ink); background:transparent; text-align:right; min-width:0; }
+    .unit { flex:none; color:var(--muted); font-weight:700; }
+    .formula { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:15px; color:var(--muted); font-size:14px; } .formula b { color:var(--blue); font-size:18px; }
+    .result { padding:20px; border-top:4px solid var(--blue); } .result .type { color:var(--muted); font-size:12px; font-weight:800; } .value { margin:8px 0 0; font:800 clamp(36px,11vw,50px)/1 ui-rounded,"SF Pro Rounded",sans-serif; letter-spacing:-.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--blue); }
+    .quantity { padding:20px; } .quantity-row { display:grid; grid-template-columns:1fr 1.05fr; align-items:end; gap:11px; } .times { padding-bottom:17px; text-align:center; color:var(--muted); font-weight:800; font-size:20px; } .small-input input { height:52px; font-size:22px; }
+    .total { border-top:4px solid var(--orange); background:#fffdf9; padding:17px 20px; } .total-line { display:flex; justify-content:space-between; align-items:baseline; gap:12px; } .total .value { margin:0; color:#c66a10; font-size:clamp(30px,9vw,44px); }
+    .key:active { transform:scale(.97); }
+    .keypad { padding:15px; display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:auto; } .key { min-height:58px; border:0; border-radius:15px; background:var(--mist); color:var(--ink); font:750 22px/1 ui-rounded,"SF Pro Rounded",sans-serif; cursor:pointer; box-shadow:inset 0 -1px #ccd7e233; } .key.utility { color:var(--blue); font-size:16px; } .key.clear { color:#c85252; } .key.delete { color:var(--navy); font-size:20px; }
+    .note { text-align:center; color:var(--muted); font-size:12px; margin:0; }
+    @media (max-height:700px) { main { gap:12px; padding-top:13px; } .entry { padding:15px; } .key { min-height:48px; } .keypad { padding:12px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header><div class="mark">÷</div><div><h1>÷1.1 計算機</h1><p class="subtitle">入力した数値をすぐに整数へ換算</p></div></header>
+    <section class="card entry" aria-label="数値入力"><label for="number">計算する数値</label><div class="input-wrap"><input id="number" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="数値を入力"><span class="unit">÷ 1.1</span></div><div class="formula"><span>入力値</span><b>÷ 1.1</b><span>を計算します</span></div></section>
+    <section class="card result" aria-live="polite"><div class="type">換算結果（小数第1位を四捨五入）</div><div class="value" id="rounded">—</div></section>
+    <section class="card quantity" aria-label="数量入力"><div class="quantity-row"><div><label for="quantity">数量</label><div class="input-wrap small-input"><input id="quantity" type="text" inputmode="numeric" autocomplete="off" placeholder="1" aria-label="数量を入力"><span class="unit">個</span></div></div><div class="times">×</div></div></section>
+    <section class="card total" aria-live="polite"><div class="total-line"><div class="type">合計</div><div class="value" id="total">—</div></div></section>
+    <section class="card keypad" aria-label="数字キーパッド">
+      <button class="key" data-key="7">7</button><button class="key" data-key="8">8</button><button class="key" data-key="9">9</button>
+      <button class="key" data-key="4">4</button><button class="key" data-key="5">5</button><button class="key" data-key="6">6</button>
+      <button class="key" data-key="1">1</button><button class="key" data-key="2">2</button><button class="key" data-key="3">3</button>
+      <button class="key utility clear" data-action="clear">C</button><button class="key" data-key="0">0</button><button class="key utility" data-key=".">.</button>
+      <button class="key utility delete" style="grid-column:1 / -1" data-action="delete">⌫  1文字削除</button>
+    </section>
+    <p class="note">数量を入力すると、換算後の値 × 数量を表示します</p>
+  </main>
+  <script>
+    const input = document.querySelector('#number');
+    const quantity = document.querySelector('#quantity');
+    const roundedEl = document.querySelector('#rounded'), totalEl = document.querySelector('#total');
+    let activeInput = input;
+    const format = n => new Intl.NumberFormat('ja-JP').format(n);
+    function scaledInteger(text) {
+      const [whole = '', fraction = ''] = text.split('.');
+      if (!/^\d*\.?\d*$/.test(text) || !/\d/.test(text)) return null;
+      return { value: BigInt((whole || '0') + fraction), scale: BigInt(10) ** BigInt(fraction.length) };
+    }
+    function calculate() {
+      const normalized = input.value.replace(/[，,]/g,'').replace(/[．]/g,'.');
+      const parsed = scaledInteger(normalized);
+      const quantityText = quantity.value.replace(/[，,]/g,'');
+      if (!parsed) { roundedEl.textContent = totalEl.textContent = '—'; return; }
+      const numerator = parsed.value * 10n;
+      const denominator = parsed.scale * 11n;
+      const rounded = (numerator * 2n + denominator) / (denominator * 2n);
+      roundedEl.textContent = format(rounded);
+      totalEl.textContent = /^\d+$/.test(quantityText) ? format(rounded * BigInt(quantityText)) : '—';
+    }
+    function insert(char) {
+      let val = activeInput.value;
+      if (activeInput === quantity && char === '.') return;
+      if (char === '.' && val.includes('.')) return;
+      if (val === '0' && char !== '.') val = '';
+      activeInput.value = val + char; activeInput.focus(); calculate();
+    }
+    [input, quantity].forEach(field => {
+      field.addEventListener('focus', () => activeInput = field);
+      field.addEventListener('input', () => { field.value = field.value.replace(field === quantity ? /[^0-9]/g : /[^0-9.,．]/g, ''); calculate(); });
+    });
+    document.querySelectorAll('[data-key]').forEach(btn => btn.addEventListener('click', () => insert(btn.dataset.key)));
+    document.querySelector('[data-action="clear"]').addEventListener('click', () => { activeInput.value=''; activeInput.focus(); calculate(); });
+    document.querySelector('[data-action="delete"]').addEventListener('click', () => { activeInput.value=activeInput.value.slice(0,-1); activeInput.focus(); calculate(); });
+  </script>
+</body>
+</html>
